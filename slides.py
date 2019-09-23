@@ -11,6 +11,7 @@ import cairo
 import math
 import re
 import collections
+import xml.etree.ElementTree as ET
 
 POINTS_PER_MM = 2.8346457
 
@@ -18,6 +19,9 @@ PAGE_WIDTH = 297
 PAGE_HEIGHT = PAGE_WIDTH * 768 // 1366
 
 SVG_PX_PER_MM = 1.0 / 3.542087542087542
+
+SVG_NS = "http://www.w3.org/2000/svg"
+INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
 background = Rsvg.Handle.new_from_file('background.svg')
 
@@ -43,9 +47,15 @@ class LayoutRenderObject(RenderObject):
         cr.restore()
 
 class ImageRenderObject(RenderObject):
-    def __init__(self, filename):
+    def __init__(self, filename, max_layer = None):
         self.image = Rsvg.Handle.new_from_file(filename)
         self.dim = self.image.get_dimensions()
+
+        if max_layer is None:
+            self.layers = None
+        else:
+            self.layers = [id for label, id in svg_layers(filename)
+                           if not layer_filtered(label, max_layer)]
 
     def get_width(self):
         return self.dim.width * SVG_PX_PER_MM
@@ -59,8 +69,34 @@ class ImageRenderObject(RenderObject):
         cr.scale(1.0 * SVG_PX_PER_MM, 1.0 * SVG_PX_PER_MM)
         p = cr.get_current_point()
         cr.translate(x_pos / SVG_PX_PER_MM, y_pos / SVG_PX_PER_MM)
-        self.image.render_cairo(cr)
+
+        if self.layers is None:
+            self.image.render_cairo(cr)
+        else:
+            for layer in self.layers:
+                self.image.render_cairo_sub(cr, layer)
+
         cr.restore()
+
+def svg_layers(filename):
+    root = ET.parse(filename).getroot()
+
+    for g in root.iter('{{{}}}g'.format(SVG_NS)):
+        try:
+            label = g.attrib['{{{}}}label'.format(INKSCAPE_NS)]
+            id = g.attrib['id']
+        except KeyError as e:
+            continue
+
+        yield label, "#{}".format(id)
+
+def layer_filtered(layer, max_layer):
+    md = re.match(r'\s*Calque\s+([0-9]+)\s*$', layer)
+
+    if md is None:
+        return False
+
+    return max_layer < int(md.group(1))
 
 def replace_include(md):
     with open(md.group(1)) as f:
@@ -84,9 +120,12 @@ def get_slides(f):
     yield buf_to_text(buf)
 
 def line_to_render_object(line, in_code):
-    md = re.match(r'^SVG: +([^\s]+)\s*$', line)
+    md = re.match(r'^SVG: +([^\s#]+)(?:#([0-9]+))?\s*$', line)
     if md:
-        return ImageRenderObject(md.group(1))
+        max_layer = md.group(2)
+        if max_layer is not None:
+            max_layer = int(max_layer)
+        return ImageRenderObject(md.group(1), max_layer)
 
     if in_code:
         font = "Mono"
