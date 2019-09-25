@@ -11,4 +11,113 @@ SVG: title-page.svg
 
 ---
 
+## What is mediump?
+
+---
+
+* Only in GLSL ES
+* Available since the first version of OpenGL ES.
+* Used to tell the driver an operation in a shader can be done with lower precision.
+* Some hardware can take advantage of this to trade off precision for speed.
+
+---
+
+* For example, an operation can be done with a 16-bit float:
+
+SVG: precision-diagram.svg
+
+---
+
+* GLSL ES has three available precisions:
+  * lowp, mediump and highp
+  * The spec specifies a minimum precision for each of these.
+  * highp needs 16-bit fractional part.
+    * It will probably end up being a single-precision float.
+  * mediump needs 10-bit fractional part.
+    * This can be represented as a half float.
+  * lowp has enough precision to store 8-bit colour channels.
+
+---
+
+* The precision does not affect the visible storage of a variable.
+  * For example a mediump float will still be stored as 32-bit in a UBO.
+  * Only operations are affected.
+* The precision requirements are only a minimum.
+  * Therefore a valid implementation could be to just ignore the precision and do every operation at highp.
+  * This is effectively what Mesa currently does.
+
+---
+
+* The precision for a variable can be specified directly:
+
+```
+uniform mediump vec3 rect_color;
+```
+
+* Or it can be specified as a global default for each type:
+
+```
+precision mediump float;
+uniform vec3 rect_color;
+```
+
+---
+
+* The compiler specifies global defaults for most types except floats in the fragment shader.
+* In GLSL ES 1.00 high precision support in fragment shaders is optional.
+
+---
+
+* The precision of operands to an operation determine the precision of the operation.
+* Almost works like automatic float to double promotion in C.
+
+SVG: simple-multiplication.svg
+
+---
+
+## How does it work?
+
+---
+
+Mesa already keeps track of the precision of variables.
+
+We added some extra code to handle this in more corner cases.
+(default precision of struct members, return values of functions).
+
+---
+
+The idea is to lower mediump operations to float16 types in NIR.
+
+---
+
+We want to lower the actual operations instead of the variables.
+
+---
+
+This needs to be done at a high level in order to implement the spec rules.
+
+---
+
+Currently this is done as a pass over the IR representation.
+
+---
+
+SVG: simple-division.svg#1
+
+---
+
+SVG: simple-division.svg#2
+
+---
+
+SVG: simple-division.svg#3
+
+---
+
+* We only want to lower the division operation without changing the type of the variables.
+* The lowering pass will add a conversion to float16 around the variable dereferences and then add a conversion back to float32 after the division.
+* This minimises the modifications to the IR.
+
+---
+
 ### Questions?
