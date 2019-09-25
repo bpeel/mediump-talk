@@ -81,6 +81,20 @@ SVG: mix-multiplication.svg*
 
 ---
 
+* Corner case
+  * Some things don’t have a precision, eg constants.
+
+SVG: constant-no-precision.svg*
+
+---
+
+* Extreme corner case
+  * Sometimes none of the operands have a precision.
+
+SVG: no-operand-has-precision.svg*
+
+---
+
 ## How does it work?
 
 ---
