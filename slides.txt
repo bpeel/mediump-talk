@@ -75,6 +75,12 @@ SVG: simple-multiplication.svg*
 
 ---
 
+* Another example
+
+SVG: mix-multiplication.svg*
+
+---
+
 ## How does it work?
 
 ---
