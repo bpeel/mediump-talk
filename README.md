@@ -1,4 +1,4 @@
-The slides for a talk about mediump precision in Mesa at FOSDEM.
+The slides for a talk about mediump precision in Mesa at XDC.
 
 The slides are described in `slides.txt`.
 
