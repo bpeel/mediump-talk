@@ -103,24 +103,39 @@ def replace_include(md):
         return f.read()
 
 def buf_to_text(buf):
-    return re.sub(r'^#include\s+([^\s]+)\s*$',
-                  replace_include,
-                  "".join(buf).strip(),
-                  flags=re.MULTILINE)
+    buf = re.sub(r'^#include\s+([^\s]+)\s*$',
+                 replace_include,
+                 "".join(buf).strip(),
+                 flags=re.MULTILINE)
+
+    md = re.search(r'^SVG: +([^\s#*]+)\*\s*$',
+                   buf,
+                   flags=re.MULTILINE)
+
+    if md is None:
+        yield buf
+    else:
+        layers = []
+        for label, id in svg_layers(md.group(1)):
+            lmd = re.match(r'^Calque ([0-9]+)$', label)
+            if lmd:
+                yield buf[0:md.end(1)] + "#" + lmd.group(1) + buf[md.end(1)+1:]
 
 def get_slides(f):
     buf = []
     sep = re.compile(r'^---\s*$')
     for line in f:
         if sep.match(line):
-            yield buf_to_text(buf)
+            for s in buf_to_text(buf):
+                yield s
             buf.clear()
         else:
             buf.append(line)
-    yield buf_to_text(buf)
+    for s in buf_to_text(buf):
+        yield s
 
 def line_to_render_object(line, in_code):
-    md = re.match(r'^SVG: +([^\s#]+)(?:#([0-9]+))?\s*$', line)
+    md = re.match(r'^SVG: +([^\s#*]+)(?:#([0-9]+))?\s*$', line)
     if md:
         max_layer = md.group(2)
         if max_layer is not None:
