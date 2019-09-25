@@ -71,7 +71,7 @@ uniform vec3 rect_color;
 * The precision of operands to an operation determine the precision of the operation.
 * Almost works like automatic float to double promotion in C.
 
-SVG: simple-multiplication.svg
+SVG: simple-multiplication.svg*
 
 ---
 
@@ -102,15 +102,7 @@ Currently this is done as a pass over the IR representation.
 
 ---
 
-SVG: simple-division.svg#1
-
----
-
-SVG: simple-division.svg#2
-
----
-
-SVG: simple-division.svg#3
+SVG: simple-division.svg*
 
 ---
 
