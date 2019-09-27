@@ -139,30 +139,19 @@ uniform block {
 
 ---
 
-# How does it work?
+# The plan
 
 ---
 
-Mesa already keeps track of the precision of variables.
-
-We added some extra code to handle this in more corner cases.
-(default precision of struct members, return values of functions).
-
----
-
-The idea is to lower mediump operations to float16 types in NIR.
+* The idea is to lower mediump operations to float16 types in NIR.
+* We want to lower the actual operations instead of the variables.
+* This needs to be done at a high level in order to implement the spec rules.
 
 ---
 
-We want to lower the actual operations instead of the variables.
-
----
-
-This needs to be done at a high level in order to implement the spec rules.
-
----
-
-Currently this is done as a pass over the IR representation.
+* Aiming specifically to make this work on the Freedreno driver.
+* Most of the work is reusable for any driver though.
+* Currently this is done as a pass over the IR representation.
 
 ---
 
@@ -173,6 +162,24 @@ SVG: simple-division.svg*
 * We only want to lower the division operation without changing the type of the variables.
 * The lowering pass will add a conversion to float16 around the variable dereferences and then add a conversion back to float32 after the division.
 * This minimises the modifications to the IR.
+
+---
+
+* IR tree before lowering pass
+
+SVG: ir-tree.svg*
+
+---
+
+* Lowering pass finds sections of the tree involving only mediump/lowp operations.
+* Adds f2f16 conversion after variable derefs
+* Adds f2f32 conversion at root of lowered branch
+
+---
+
+* IR tree after lowering pass
+
+SVG: ir-tree-after.svg*
 
 ---
 
