@@ -25,8 +25,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.52109092"
-     inkscape:cx="571.03452"
+     inkscape:zoom="0.75852371"
+     inkscape:cx="511.09837"
      inkscape:cy="250.77988"
      inkscape:document-units="mm"
      inkscape:current-layer="layer3"
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -62,40 +62,40 @@
        y="186.13313"
        id="text897"><tspan
          sodipodi:role="line"
-         id="tspan895"
          x="26.785061"
          y="186.13313"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px">uniform mediump float a, b;</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
+         id="tspan909">uniform mediump float a, b;</tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="198.66267"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan899"></tspan><tspan
+         id="tspan1630"></tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="211.19221"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan901">void main()</tspan><tspan
+         id="tspan1632">void main()</tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="223.72174"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan903">{</tspan><tspan
+         id="tspan1634">{</tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="236.25128"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan905">    gl_FragColor.rgba = vec4(a / b);</tspan><tspan
+         id="tspan1636">    gl_FragColor.r = a / b;</tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="248.78082"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan907">}</tspan><tspan
+         id="tspan1638">}</tspan><tspan
          sodipodi:role="line"
          x="26.785061"
          y="261.31036"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.39048862px;font-family:'Noto Sans Mono';-inkscape-font-specification:'Noto Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.94919771px"
-         id="tspan909" /></text>
+         id="tspan1640" /></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -134,8 +134,8 @@
        id="rect943"
        width="36.050171"
        height="17.263462"
-       x="223.96007"
-       y="93.899651" />
+       x="168.84753"
+       y="93.550835" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.95198631px;line-height:110.00000238%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:0px;word-spacing:0px;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;display:inline;opacity:1;vector-effect:none;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.9959988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -154,7 +154,7 @@
          id="tspan949">done at medium precision</tspan></text>
     <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 179.74311,126.77482 63.4686,-15.6117"
+       d="m 143.4665,124.33313 44.63267,-13.51882"
        id="path951"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />

@@ -179,7 +179,7 @@ SVG: ir-tree.svg*
 
 * IR tree after lowering pass
 
-SVG: ir-tree-after.svg*
+SVG: ir-tree-after.svg*=
 
 ---
 
