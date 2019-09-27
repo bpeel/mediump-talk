@@ -118,7 +118,8 @@ def buf_to_text(buf):
     if md is None:
         yield buf
     else:
-        layers = []
+        if len(md.group(2)) > 0:
+            yield buf[0:md.end(1)] + "#0="
         for label, id in svg_layers(md.group(1)):
             lmd = re.match(r'^Calque ([0-9]+)$', label)
             if lmd:
