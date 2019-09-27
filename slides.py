@@ -45,7 +45,7 @@ class LayoutRenderObject(RenderObject):
         cr.restore()
 
 class ImageRenderObject(RenderObject):
-    def __init__(self, filename, max_layer = None):
+    def __init__(self, filename, max_layer = None, exact = False):
         self.image = Rsvg.Handle.new_from_file(filename)
         self.dim = self.image.get_dimensions()
 
@@ -53,7 +53,7 @@ class ImageRenderObject(RenderObject):
             self.layers = None
         else:
             self.layers = [id for label, id in svg_layers(filename)
-                           if not layer_filtered(label, max_layer)]
+                           if not layer_filtered(label, max_layer, exact)]
 
     def get_width(self):
         return self.dim.width * SVG_PX_PER_MM
@@ -88,13 +88,18 @@ def svg_layers(filename):
 
         yield label, "#{}".format(id)
 
-def layer_filtered(layer, max_layer):
+def layer_filtered(layer, max_layer, exact):
     md = re.match(r'\s*Calque\s+([0-9]+)\s*$', layer)
 
     if md is None:
         return False
 
-    return max_layer < int(md.group(1))
+    layer_num = int(md.group(1))
+
+    if exact:
+        return max_layer != layer_num
+    else:
+        return max_layer < layer_num
 
 def replace_include(md):
     with open(md.group(1)) as f:
@@ -106,7 +111,7 @@ def buf_to_text(buf):
                  "".join(buf).strip(),
                  flags=re.MULTILINE)
 
-    md = re.search(r'^SVG: +([^\s#*]+)\*\s*$',
+    md = re.search(r'^SVG: +([^\s#*=]+)\*(=?)\s*$',
                    buf,
                    flags=re.MULTILINE)
 
@@ -117,7 +122,7 @@ def buf_to_text(buf):
         for label, id in svg_layers(md.group(1)):
             lmd = re.match(r'^Calque ([0-9]+)$', label)
             if lmd:
-                yield buf[0:md.end(1)] + "#" + lmd.group(1) + buf[md.end(1)+1:]
+                yield buf[0:md.end(1)] + "#" + lmd.group(1) + md.group(2)
 
 def get_slides(f):
     buf = []
@@ -167,12 +172,13 @@ class SlideRenderer:
         self.sections.append(id)
 
     def line_to_render_object(self, line, in_code):
-        md = re.match(r'^SVG: +([^\s#*]+)(?:#([0-9]+))?\s*$', line)
+        md = re.match(r'^SVG: +([^\s#*=]+)(?:#([0-9]+)(=)?)?\s*$', line)
         if md:
             max_layer = md.group(2)
             if max_layer is not None:
                 max_layer = int(max_layer)
-            return ImageRenderObject(md.group(1), max_layer)
+            exact = bool(md.group(3))
+            return ImageRenderObject(md.group(1), max_layer, exact)
 
         if in_code:
             font = "Mono"
