@@ -149,6 +149,12 @@ uniform block {
 
 ---
 
+* Work being done by Hyunjun Ko and myself and Igalia.
+* Working on behalf of Google.
+* Based on / inspired by patches by Topi Pohjolainen.
+
+---
+
 * Aiming specifically to make this work on the Freedreno driver.
 * Most of the work is reusable for any driver though.
 * Currently this is done as a pass over the IR representation.
@@ -180,6 +186,23 @@ SVG: ir-tree.svg*
 * IR tree after lowering pass
 
 SVG: ir-tree-after.svg*=
+
+---
+
+# Reducing conversion operations
+
+---
+
+* This will end up generating a lot of conversion operations.
+* Worse:
+
+SVG: worse.svg*=
+
+---
+
+* Resulting NIR
+
+SVG: nir-lots-conv.svg*
 
 ---
 
