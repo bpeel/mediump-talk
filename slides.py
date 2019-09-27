@@ -23,8 +23,6 @@ SVG_PX_PER_MM = 1.0 / 3.542087542087542
 SVG_NS = "http://www.w3.org/2000/svg"
 INKSCAPE_NS = "http://www.inkscape.org/namespaces/inkscape"
 
-background = Rsvg.Handle.new_from_file('background.svg')
-
 class RenderObject:
     pass
 
@@ -134,96 +132,111 @@ def get_slides(f):
     for s in buf_to_text(buf):
         yield s
 
-def line_to_render_object(line, in_code):
-    md = re.match(r'^SVG: +([^\s#*]+)(?:#([0-9]+))?\s*$', line)
-    if md:
-        max_layer = md.group(2)
-        if max_layer is not None:
-            max_layer = int(max_layer)
-        return ImageRenderObject(md.group(1), max_layer)
+class SlideRenderer:
+    def __init__(self):
+        self.surface = cairo.PDFSurface("mediump-slides.pdf",
+                                        PAGE_WIDTH * POINTS_PER_MM,
+                                        PAGE_HEIGHT * POINTS_PER_MM)
 
-    if in_code:
-        font = "Mono"
-        font_size = 10
-    else:
-        font = "Sans"
-        font_size = 16
+        self.cr = cairo.Context(self.surface)
 
-    layout = PangoCairo.create_layout(cr)
+        # Use mm for the units from now on
+        self.cr.scale(POINTS_PER_MM, POINTS_PER_MM)
 
-    if not in_code:
-        md = re.match(r'(#+) +(.*)', line)
+        # Use ½mm line width
+        self.cr.set_line_width(0.5)
+
+        self.slide_num = 0
+        self.sections = []
+
+        self.background = Rsvg.Handle.new_from_file('background.svg')
+
+    def line_to_render_object(self, line, in_code):
+        md = re.match(r'^SVG: +([^\s#*]+)(?:#([0-9]+))?\s*$', line)
         if md:
-            font_size *= 1.1 * len(md.group(1))
-            line = md.group(2)
+            max_layer = md.group(2)
+            if max_layer is not None:
+                max_layer = int(max_layer)
+            return ImageRenderObject(md.group(1), max_layer)
+
+        if in_code:
+            font = "Mono"
+            font_size = 10
         else:
-            md = re.match(r'((?:  )*)\* +(.*)', line)
+            font = "Sans"
+            font_size = 16
+
+        layout = PangoCairo.create_layout(self.cr)
+
+        if not in_code:
+            md = re.match(r'(#+) +(.*)', line)
             if md:
-                spaces = len(md.group(1)) // 2
-                line = "\u2022\t" + md.group(2)
-                tab_stop = 10 * POINTS_PER_MM * Pango.SCALE
-                if spaces > 0:
-                    n_tabs = 2
-                else:
-                    n_tabs = 1
-                tab_array = Pango.TabArray(n_tabs, False)
-                if spaces > 0:
-                    line = "\t" + line
-                    tab_array.set_tab(0, Pango.TabAlign.LEFT, tab_stop * spaces)
-                tab_array.set_tab(n_tabs - 1,
-                                  Pango.TabAlign.LEFT,
-                                  tab_stop * (spaces + 1))
-                layout.set_tabs(tab_array)
-                layout.set_indent(-tab_stop * (spaces + 1))
+                header_level = len(md.group(1))
+                font_size *= 1.1 * header_level
+                line = md.group(2)
+            else:
+                md = re.match(r'((?:  )*)\* +(.*)', line)
+                if md:
+                    spaces = len(md.group(1)) // 2
+                    line = "\u2022\t" + md.group(2)
+                    tab_stop = 10 * POINTS_PER_MM * Pango.SCALE
+                    if spaces > 0:
+                        n_tabs = 2
+                    else:
+                        n_tabs = 1
+                    tab_array = Pango.TabArray(n_tabs, False)
+                    if spaces > 0:
+                        line = "\t" + line
+                        tab_array.set_tab(0,
+                                          Pango.TabAlign.LEFT,
+                                          tab_stop * spaces)
+                    tab_array.set_tab(n_tabs - 1,
+                                      Pango.TabAlign.LEFT,
+                                      tab_stop * (spaces + 1))
+                    layout.set_tabs(tab_array)
+                    layout.set_indent(-tab_stop * (spaces + 1))
 
-    fd = Pango.FontDescription.from_string("{} {}".format(font, font_size))
-    layout.set_font_description(fd)
-    layout.set_width(PAGE_WIDTH * 0.7 * POINTS_PER_MM * Pango.SCALE)
-    layout.set_text(line, -1)
+        fd = Pango.FontDescription.from_string("{} {}".format(font, font_size))
+        layout.set_font_description(fd)
+        layout.set_width(PAGE_WIDTH * 0.7 * POINTS_PER_MM * Pango.SCALE)
+        layout.set_text(line, -1)
 
-    return LayoutRenderObject(layout)
+        return LayoutRenderObject(layout)
 
-def render_slide(cr, text):
-    cr.save()
-    # Scale to mm
-    cr.scale(1.0 * SVG_PX_PER_MM, 1.0 * SVG_PX_PER_MM)
-    background.render_cairo(cr)
-    cr.restore()
+    def render_slide(self, text):
+        if self.slide_num > 0:
+            self.cr.show_page()
 
-    objects = []
-    in_code = False
+        self.cr.save()
+        # Scale to mm
+        self.cr.scale(1.0 * SVG_PX_PER_MM, 1.0 * SVG_PX_PER_MM)
+        self.background.render_cairo(self.cr)
+        self.cr.restore()
 
-    for line in text.split('\n'):
-        if re.match(r'^```\s*$', line):
-            in_code = not in_code
-        else:
-            objects.append(line_to_render_object(line, in_code))
+        objects = []
+        in_code = False
 
-    total_height = sum(obj.get_height() for obj in objects)
-    max_width = max(obj.get_width() for obj in objects)
+        for line in text.split('\n'):
+            if re.match(r'^```\s*$', line):
+                in_code = not in_code
+            else:
+                objects.append(self.line_to_render_object(line, in_code))
 
-    x_pos = PAGE_WIDTH / 2.0 - max_width / 2.0
-    y_pos = PAGE_HEIGHT / 2.0 - total_height / 2.0
+        total_height = sum(obj.get_height() for obj in objects)
+        max_width = max(obj.get_width() for obj in objects)
 
-    for obj in objects:
-        cr.move_to(x_pos, y_pos)
-        obj.render(cr, x_pos, y_pos)
-        y_pos += obj.get_height()
+        x_pos = PAGE_WIDTH / 2.0 - max_width / 2.0
+        y_pos = PAGE_HEIGHT / 2.0 - total_height / 2.0
 
-surface = cairo.PDFSurface("mediump-slides.pdf",
-                           PAGE_WIDTH * POINTS_PER_MM,
-                           PAGE_HEIGHT * POINTS_PER_MM)
+        for obj in objects:
+            self.cr.move_to(x_pos, y_pos)
+            obj.render(self.cr, x_pos, y_pos)
+            y_pos += obj.get_height()
 
-cr = cairo.Context(surface)
-
-# Use mm for the units from now on
-cr.scale(POINTS_PER_MM, POINTS_PER_MM)
-
-# Use ½mm line width
-cr.set_line_width(0.5)
+        self.slide_num += 1
 
 with open('slides.txt', 'rt', encoding='UTF-8') as f:
-    for slide_num, slide in enumerate(get_slides(f)):
-        if slide_num > 0:
-            cr.show_page()
-        render_slide(cr, slide)
+    renderer = SlideRenderer()
+
+    for slide in get_slides(f):
+        renderer.render_slide(slide)
