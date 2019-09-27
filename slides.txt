@@ -1,6 +1,6 @@
 SVG: title-page.svg
 ---
-## Overview
+# Overview
 
 * Introduction
 * History
@@ -11,7 +11,7 @@ SVG: title-page.svg
 
 ---
 
-## What is mediump?
+# What is mediump?
 
 ---
 
@@ -95,7 +95,7 @@ SVG: no-operand-has-precision.svg*
 
 ---
 
-## How does it work?
+# How does it work?
 
 ---
 
@@ -132,4 +132,4 @@ SVG: simple-division.svg*
 
 ---
 
-### Questions?
+# Questions?

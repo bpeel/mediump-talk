@@ -172,7 +172,7 @@ class SlideRenderer:
             md = re.match(r'(#+) +(.*)', line)
             if md:
                 header_level = len(md.group(1))
-                font_size *= 1.1 * header_level
+                font_size *= 1.2 ** (6 - header_level)
                 line = md.group(2)
             else:
                 md = re.match(r'((?:  )*)\* +(.*)', line)
