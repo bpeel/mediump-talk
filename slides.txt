@@ -95,6 +95,50 @@ SVG: no-operand-has-precision.svg*
 
 ---
 
+# What does Mesa currently do?
+
+---
+
+* Mesa already has code to parse the precision qualiers and store them in the IR tree.
+* These currently aren’t used for anything except to check for compile-time errors.
+  * For example redeclaring a variable with a different precision.
+* In desktop GL, the precision is always set to NONE.
+
+---
+
+* The precision usually doesn’t form part of the glsl_type.
+* Instead it is stored out-of-band as part of the ir_variable.
+
+---
+```
+enum {
+   GLSL_PRECISION_NONE = 0,
+   GLSL_PRECISION_HIGH,
+   GLSL_PRECISION_MEDIUM,
+   GLSL_PRECISION_LOW
+};
+```
+---
+
+```
+#include var-precision.cpp
+```
+
+---
+
+* However this gets complicated for structs because members can have their own precision.
+
+```
+uniform block {
+	mediump vec3 just_a_color;
+	highp mat4 important_matrix;
+} things;
+```
+
+* In that case the precision does end up being part of the glsl_type.
+
+---
+
 # How does it work?
 
 ---
