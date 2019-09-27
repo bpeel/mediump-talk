@@ -151,6 +151,21 @@ class SlideRenderer:
 
         self.background = Rsvg.Handle.new_from_file('background.svg')
 
+    def add_index_item(self, header_level, line):
+        if len(self.sections) > header_level:
+            del self.sections[header_level:]
+        elif len(self.sections) < header_level:
+            self.sections.extend([None] * header_level)
+
+        parent = next((x for x in reversed(self.sections) if x is not None),
+                      cairo.PDF_OUTLINE_ROOT)
+
+        id = self.surface.add_outline(parent,
+                                      line,
+                                      "page={}".format(self.slide_num + 1),
+                                      0)
+        self.sections.append(id)
+
     def line_to_render_object(self, line, in_code):
         md = re.match(r'^SVG: +([^\s#*]+)(?:#([0-9]+))?\s*$', line)
         if md:
@@ -174,6 +189,7 @@ class SlideRenderer:
                 header_level = len(md.group(1))
                 font_size *= 1.2 ** (6 - header_level)
                 line = md.group(2)
+                self.add_index_item(header_level, line)
             else:
                 md = re.match(r'((?:  )*)\* +(.*)', line)
                 if md:
