@@ -2,12 +2,15 @@ SVG: title-page.svg
 ---
 # Overview
 
-* Introduction
-* History
-* Examples
-* Current status
-* Future
-* Questions
+* What is mediump?
+* What does Mesa currently do?
+* The plan
+* Reducing conversion operations
+* Changing types of variables
+* Folding conversions
+* Testing
+* Code
+* Questions?
 
 ---
 
@@ -16,7 +19,7 @@ SVG: title-page.svg
 ---
 
 * Only in GLSL ES
-* Available since the first version of OpenGL ES.
+* Available since the first version of GLSL ES.
 * Used to tell the driver an operation in a shader can be done with lower precision.
 * Some hardware can take advantage of this to trade off precision for speed.
 
@@ -206,7 +209,7 @@ SVG: nir-lots-conv.svg*
 
 ---
 
-* We added a NIR optimisation to remove redundant conversions
+* There is a NIR optimisation to remove redundant conversions
 * Only enabled for GLES because converting f32→f16→f32 is not lossless
 
 ---
@@ -245,6 +248,62 @@ SVG: change-frag-output-type-3.svg
 
 ---
 
+* Consider this simple fragment shader
 
+SVG: folding-glsl-example.svg*=
+
+---
+
+* This can generate an IR3 disassembly like this:
+
+SVG: folding-ir3-example.svg*=
+
+---
+
+* This last conversion shouldn’t be necessary.
+* Adreno allows the destination register to have a different size from the source registers.
+* We can fold the conversion directly into the multiplication.
+
+---
+
+* We have added a pass on the NIR that does this folding.
+* It requires changes the NIR validation to allow the dest to have a different size.
+* Only enabled for Freedreno.
+
+---
+
+SVG: nir-folding-1.svg
+
+---
+
+SVG: nir-folding-2.svg
+
+---
+
+SVG: nir-folding-3.svg*=
+
+---
+
+# Testing
+
+---
+
+* We are writing Piglit tests that use mediump
+* Most of them check that the result is less accurate than if it was done at highp
+* That way we catch regressions where we break the lowering
+* These tests couldn’t be merged into Piglit proper because not lowering would be valid behaviour.
+
+---
+
+# Code
+
+---
+
+* The code is at gitlab.freedesktop.org/zzoon on the mediump branch
+* There are also merge requests (1043, 1044, 1045).
+* Piglit tests are at: https://github.com/Igalia/piglit/
+  * branch nroberts/wip/mediump-tests
+
+---
 
 # Questions?
