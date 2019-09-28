@@ -206,4 +206,45 @@ SVG: nir-lots-conv.svg*
 
 ---
 
+* We added a NIR optimisation to remove redundant conversions
+* Only enabled for GLES because converting f32→f16→f32 is not lossless
+
+---
+
+# Changing types of variables
+
+---
+
+* Normally we don’t want to change the type of variables
+* For example, this would break uniforms because they are visible to the app
+* Sometimes we can do it anyway though depending on the hardware
+
+---
+
+* On Freedreno, we can change the type of the fragment outputs if they are mediump.
+* gl_FragColor is declared as mediump by default
+* The variable type is not user-visible so it won’t break the app.
+* This removes a conversion.
+* We have a specific pass for Freedreno to do this.
+
+---
+
+SVG: change-frag-output-type.svg
+
+---
+
+SVG: change-frag-output-type-2.svg
+
+---
+
+SVG: change-frag-output-type-3.svg
+
+---
+
+# Folding conversions
+
+---
+
+
+
 # Questions?
