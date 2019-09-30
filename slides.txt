@@ -152,7 +152,7 @@ uniform block {
 
 ---
 
-* Work being done by Hyunjun Ko and myself and Igalia.
+* Work being done by Hyunjun Ko and myself at Igalia.
 * Working on behalf of Google.
 * Based on / inspired by patches by Topi Pohjolainen.
 
