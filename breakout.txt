@@ -1,0 +1,62 @@
+SVG: breakout-title-page.svg
+---
+# Problems from the talk
+
+---
+## Can’t merge Piglit tests
+
+* The Piglit tests can’t be merged into master.
+  * They check that lowering took place, but lowering is optional in the spec.
+
+---
+## Solution
+
+* Write unit tests in the source tree.
+* Already started on this.
+* Added a --lower-precision option to standalone compiler.
+* Python script invokes this with various shaders and greps for float16.
+---
+## Optimising out f32→f16→f32 conversions is dodgy
+
+* This is not a lossless conversion.
+* If one day GLSL ES gains a native float16 type we can’t rely on this being safe.
+---
+## Solution
+
+* Implement a new f2fmp opcode in IR and NIR.
+* Same as f2f16 except is allowed to be optimised out.
+* Can be lowered to a normal f2f16 instruction after nir_op_algorithmic is finished.
+---
+## Changing how NIR works is bad
+
+* We want to fold conversion ops into instructions.
+* Idea was to change NIR validation to allow opcodes with different dest size from source size.
+* This might break things that are assuming this isn’t the case.
+---
+## Solution
+
+* We will move the folding into the code generation for IR3.
+---
+## Might be handling builtins wrong
+
+* The lowering pass sees builtins as opcodes which likely means we are lowering too late.
+---
+## Solution
+
+* Move the lowering pass to happen at the earliest possible point.
+* Check that we still handle builtins if they appear as function calls.
+---
+# Land branch
+
+* After fixing these short term issues we can land the branch.
+* For the time being this will be Freedreno-specific and behind an opt-in debug option.
+---
+# Long-term
+---
+* Adopt the lowering branch so that it only marks operations as mediump without adding conversions.
+* Pass the information down through to NIR.
+* Make sure that it survives all of the optimisations.
+* Lower at a much later stage using these hints.
+* This will be good to implement the Vulkan/SPIR-V precision as well.
+---
+# Thanks!

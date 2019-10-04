@@ -139,8 +139,8 @@ def get_slides(f):
         yield s
 
 class SlideRenderer:
-    def __init__(self):
-        self.surface = cairo.PDFSurface("mediump-slides.pdf",
+    def __init__(self, output_file):
+        self.surface = cairo.PDFSurface(output_file,
                                         PAGE_WIDTH * POINTS_PER_MM,
                                         PAGE_HEIGHT * POINTS_PER_MM)
 
@@ -258,8 +258,12 @@ class SlideRenderer:
 
         self.slide_num += 1
 
-with open('slides.txt', 'rt', encoding='UTF-8') as f:
-    renderer = SlideRenderer()
+def build_slides(input_file, output_file):
+    with open(input_file, 'rt', encoding='UTF-8') as f:
+        renderer = SlideRenderer(output_file)
 
-    for slide in get_slides(f):
-        renderer.render_slide(slide)
+        for slide in get_slides(f):
+            renderer.render_slide(slide)
+
+build_slides('slides.txt', 'mediump-slides.pdf')
+build_slides('breakout.txt', 'mediump-breakout-slides.pdf')
